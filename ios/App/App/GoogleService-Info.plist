@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>400460108408-34jm219iob40279rgolqn6qt1g94bnd8.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.400460108408-34jm219iob40279rgolqn6qt1g94bnd8</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDXXHNNgtUQTsY8sOe82DR8hMRDtHrzNN8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>400460108408</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.shioyasoft.music</string>
+	<key>PROJECT_ID</key>
+	<string>shioya-shogi</string>
+	<key>STORAGE_BUCKET</key>
+	<string>shioya-shogi.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:400460108408:ios:97433c28b6cb01d830538d</string>
+</dict>
+</plist>

@@ -15,6 +15,22 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		65E7D4A32FB48E3D0037E0ED /* GoogleAuthPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D4A02FB48E3D0037E0ED /* GoogleAuthPlugin.m */; };
+		65E7D4A42FB48E3D0037E0ED /* AuthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D49F2FB48E3D0037E0ED /* AuthPlugin.swift */; };
+		65E7D4A52FB48E3D0037E0ED /* AppIconPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D49C2FB48E3D0037E0ED /* AppIconPlugin.m */; };
+		65E7D4A62FB48E3D0037E0ED /* AppIconPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D49D2FB48E3D0037E0ED /* AppIconPlugin.swift */; };
+		65E7D4A72FB48E3D0037E0ED /* GoogleAuthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D4A12FB48E3D0037E0ED /* GoogleAuthPlugin.swift */; };
+		65E7D4A82FB48E3D0037E0ED /* AuthPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D49E2FB48E3D0037E0ED /* AuthPlugin.m */; };
+		65E7D4A92FB48E3D0037E0ED /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D4A22FB48E3D0037E0ED /* ViewController.swift */; };
+		65E7D4AC2FB48E970037E0ED /* AdMobPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D4AB2FB48E970037E0ED /* AdMobPlugin.swift */; };
+		65E7D4AD2FB48E970037E0ED /* AdMobPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E7D4AA2FB48E970037E0ED /* AdMobPlugin.m */; };
+		65E7D4B02FB490710037E0ED /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 65E7D4AF2FB490710037E0ED /* GoogleSignIn */; };
+		65E7D4B22FB490710037E0ED /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 65E7D4B12FB490710037E0ED /* GoogleSignInSwift */; };
+		65E7D4B52FB490880037E0ED /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 65E7D4B42FB490880037E0ED /* GoogleMobileAds */; };
+		65E7D4B92FB49C3A0037E0ED /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 65E7D4B82FB49C3A0037E0ED /* GoogleService-Info.plist */; };
+		65E7D4BC2FB49D090037E0ED /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 65E7D4BB2FB49D090037E0ED /* FirebaseAnalytics */; };
+		65E7D4BE2FB49D090037E0ED /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 65E7D4BD2FB49D090037E0ED /* FirebaseAuth */; };
+		65E7D4C02FB49D090037E0ED /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 65E7D4BF2FB49D090037E0ED /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +43,16 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		65E7D49C2FB48E3D0037E0ED /* AppIconPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppIconPlugin.m; sourceTree = "<group>"; };
+		65E7D49D2FB48E3D0037E0ED /* AppIconPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconPlugin.swift; sourceTree = "<group>"; };
+		65E7D49E2FB48E3D0037E0ED /* AuthPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AuthPlugin.m; sourceTree = "<group>"; };
+		65E7D49F2FB48E3D0037E0ED /* AuthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPlugin.swift; sourceTree = "<group>"; };
+		65E7D4A02FB48E3D0037E0ED /* GoogleAuthPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GoogleAuthPlugin.m; sourceTree = "<group>"; };
+		65E7D4A12FB48E3D0037E0ED /* GoogleAuthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthPlugin.swift; sourceTree = "<group>"; };
+		65E7D4A22FB48E3D0037E0ED /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		65E7D4AA2FB48E970037E0ED /* AdMobPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdMobPlugin.m; sourceTree = "<group>"; };
+		65E7D4AB2FB48E970037E0ED /* AdMobPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobPlugin.swift; sourceTree = "<group>"; };
+		65E7D4B82FB49C3A0037E0ED /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		65EF17DC2FB4386A00A39037 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -36,7 +62,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65E7D4B52FB490880037E0ED /* GoogleMobileAds in Frameworks */,
+				65E7D4BE2FB49D090037E0ED /* FirebaseAuth in Frameworks */,
+				65E7D4B22FB490710037E0ED /* GoogleSignInSwift in Frameworks */,
 				4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */,
+				65E7D4BC2FB49D090037E0ED /* FirebaseAnalytics in Frameworks */,
+				65E7D4B02FB490710037E0ED /* GoogleSignIn in Frameworks */,
+				65E7D4C02FB49D090037E0ED /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,10 +100,20 @@
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
+				65E7D4B82FB49C3A0037E0ED /* GoogleService-Info.plist */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				65E7D49C2FB48E3D0037E0ED /* AppIconPlugin.m */,
+				65E7D49D2FB48E3D0037E0ED /* AppIconPlugin.swift */,
+				65E7D49E2FB48E3D0037E0ED /* AuthPlugin.m */,
+				65E7D49F2FB48E3D0037E0ED /* AuthPlugin.swift */,
+				65E7D4A02FB48E3D0037E0ED /* GoogleAuthPlugin.m */,
+				65E7D4A12FB48E3D0037E0ED /* GoogleAuthPlugin.swift */,
+				65E7D4A22FB48E3D0037E0ED /* ViewController.swift */,
+				65E7D4AA2FB48E970037E0ED /* AdMobPlugin.m */,
+				65E7D4AB2FB48E970037E0ED /* AdMobPlugin.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -94,6 +136,12 @@
 			name = App;
 			packageProductDependencies = (
 				4D22ABE82AF431CB00220026 /* CapApp-SPM */,
+				65E7D4AF2FB490710037E0ED /* GoogleSignIn */,
+				65E7D4B12FB490710037E0ED /* GoogleSignInSwift */,
+				65E7D4B42FB490880037E0ED /* GoogleMobileAds */,
+				65E7D4BB2FB49D090037E0ED /* FirebaseAnalytics */,
+				65E7D4BD2FB49D090037E0ED /* FirebaseAuth */,
+				65E7D4BF2FB49D090037E0ED /* FirebaseFirestore */,
 			);
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
@@ -110,7 +158,7 @@
 				TargetAttributes = {
 					504EC3031FED79650016851F = {
 						CreatedOnToolsVersion = 9.2;
-						LastSwiftMigration = 1100;
+						LastSwiftMigration = 2650;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -126,6 +174,9 @@
 			mainGroup = 504EC2FB1FED79650016851F;
 			packageReferences = (
 				D4C12C0A2AAA248700AAC8A2 /* XCLocalSwiftPackageReference "CapApp-SPM" */,
+				65E7D4AE2FB490710037E0ED /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				65E7D4B32FB490880037E0ED /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				65E7D4BA2FB49D090037E0ED /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 504EC3051FED79650016851F /* Products */;
 			projectDirPath = "";
@@ -147,6 +198,7 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				65E7D4B92FB49C3A0037E0ED /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -157,6 +209,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65E7D4A32FB48E3D0037E0ED /* GoogleAuthPlugin.m in Sources */,
+				65E7D4A42FB48E3D0037E0ED /* AuthPlugin.swift in Sources */,
+				65E7D4A52FB48E3D0037E0ED /* AppIconPlugin.m in Sources */,
+				65E7D4A62FB48E3D0037E0ED /* AppIconPlugin.swift in Sources */,
+				65E7D4A72FB48E3D0037E0ED /* GoogleAuthPlugin.swift in Sources */,
+				65E7D4A82FB48E3D0037E0ED /* AuthPlugin.m in Sources */,
+				65E7D4A92FB48E3D0037E0ED /* ViewController.swift in Sources */,
+				65E7D4AC2FB48E970037E0ED /* AdMobPlugin.swift in Sources */,
+				65E7D4AD2FB48E970037E0ED /* AdMobPlugin.m in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -188,6 +249,8 @@
 			baseConfigurationReference = 958DCC722DB07C7200EA8C5F /* debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "\"KomiyaIcon ShioyaIcon HappaIcon MachidaIcon\"";
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -245,6 +308,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "\"KomiyaIcon ShioyaIcon HappaIcon MachidaIcon\"";
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -296,7 +361,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 958DCC722DB07C7200EA8C5F /* debug.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "\"KomiyaIcon ShioyaIcon HappaIcon MachidaIcon\"";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -312,6 +379,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.shioyasoft.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -320,7 +388,9 @@
 		504EC3181FED79650016851F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "\"KomiyaIcon ShioyaIcon HappaIcon MachidaIcon\"";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -370,11 +440,68 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		65E7D4AE2FB490710037E0ED /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
+		65E7D4B32FB490880037E0ED /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.3.0;
+			};
+		};
+		65E7D4BA2FB49D090037E0ED /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.13.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		4D22ABE82AF431CB00220026 /* CapApp-SPM */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D4C12C0A2AAA248700AAC8A2 /* XCLocalSwiftPackageReference "CapApp-SPM" */;
 			productName = "CapApp-SPM";
+		};
+		65E7D4AF2FB490710037E0ED /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65E7D4AE2FB490710037E0ED /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		65E7D4B12FB490710037E0ED /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65E7D4AE2FB490710037E0ED /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		65E7D4B42FB490880037E0ED /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65E7D4B32FB490880037E0ED /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+		65E7D4BB2FB49D090037E0ED /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65E7D4BA2FB49D090037E0ED /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		65E7D4BD2FB49D090037E0ED /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65E7D4BA2FB49D090037E0ED /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		65E7D4BF2FB49D090037E0ED /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 65E7D4BA2FB49D090037E0ED /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

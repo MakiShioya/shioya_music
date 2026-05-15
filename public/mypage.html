@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title id="ui-title">マイページ | Shioya Music</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .mypage-panel {
+            width: 100%; max-width: 900px; margin: 0 auto;
+            background: var(--panel-bg); border: 1px solid var(--panel-border);
+            border-radius: 20px; padding: 30px; backdrop-filter: blur(15px);
+            transition: background 0.5s ease;
+        }
+        
+        .section-title {
+            font-size: 1.5rem; color: var(--title-color);
+            border-bottom: 2px solid rgba(255, 152, 0, 0.3);
+            padding-bottom: 10px; margin-bottom: 25px; margin-top: 40px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        .back-btn {
+            background: none; border: none; color: var(--text-main); font-size: 1.1rem;
+            cursor: pointer; text-decoration: none; display: flex; align-items: center; font-weight: bold;
+        }
+        .back-btn:hover { color: var(--accent-orange); }
+
+        /* --- アカウントダッシュボード --- */
+        .account-dashboard {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px; padding: 25px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .account-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; width: 100%;}
+        .user-name-area { font-size: 1.3rem; font-weight: bold; }
+        .provider-badge { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 10px; margin-left: 10px; font-weight: normal;}
+        .gold-display { font-size: 1.5rem; color: var(--accent-orange); font-weight: bold; background: rgba(255, 152, 0, 0.1); padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255, 152, 0, 0.3); display: inline-block;}
+        .account-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* --- タブナビゲーション --- */
+        .tab-nav {
+            display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;
+        }
+        .tab-btn {
+            background: transparent; border: none; color: var(--text-sub); font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; padding: 8px 20px; border-radius: 20px; transition: 0.3s;
+        }
+        .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+        .tab-btn.active { background: var(--accent-orange); color: #fff; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.4); }
+        
+        .sub-tab-nav { display: flex; gap: 10px; margin-bottom: 25px; justify-content: center;}
+        .sub-tab-btn { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--text-sub); padding: 6px 15px; border-radius: 15px; cursor: pointer; transition: 0.2s;}
+        .sub-tab-btn.active { background: rgba(255,255,255,0.1); color: var(--text-main); border-color: rgba(255,255,255,0.3); font-weight: bold;}
+
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- ショップカード（グリッド） --- */
+        .shop-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;
+        }
+        .shop-card {
+            background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.05);
+            border-radius: 15px; padding: 20px; text-align: center; position: relative;
+            display: flex; flex-direction: column; justify-content: space-between; gap: 15px;
+            transition: 0.3s;
+        }
+        .shop-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); background: rgba(255,255,255,0.05); }
+        .shop-card.owned { border-color: rgba(255,255,255,0.3); }
+        .shop-card.equipped { border-color: var(--accent-orange); background: rgba(255, 152, 0, 0.1); box-shadow: 0 0 15px rgba(255, 152, 0, 0.2); }
+        
+        .status-badge {
+            position: absolute; top: -10px; right: -10px; padding: 5px 12px; border-radius: 12px;
+            font-size: 0.85rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 10;
+        }
+        .badge-owned { background: #4caf50; color: #fff; }
+        .badge-equipped { background: var(--accent-orange); color: #fff; }
+        
+        .card-preview { height: 90px; display: flex; justify-content: center; align-items: center; }
+        .card-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);}
+        
+        .card-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
+        .card-price { font-size: 1.2rem; color: var(--accent-orange); font-weight: bold; margin: 5px 0; }
+        .card-price.free { color: var(--accent-pink); }
+        
+        .color-circles { display: flex; justify-content: center; gap: 8px; }
+        .circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+
+        #account-setting-icon { transition: transform 0.3s ease; }
+        #account-setting-icon:hover { transform: rotate(45deg); }
+    </style>
+    <script>
+        const savedTheme = localStorage.getItem('shioyaMusic_theme') || 'theme-default';
+        document.documentElement.className = savedTheme;
+        // 保存された言語を取得
+        const currentLang = localStorage.getItem('shioyaMusic_lang') || 'ja';
+    </script>
+</head>
+<body>
+    <script>document.body.className = savedTheme;</script>
+
+    <header>
+        <a href="index.html" class="back-btn" id="ui-back-btn">◀ 戻る</a>
+        <div class="logo">MY PAGE</div>
+        <div style="width: 60px;"></div> 
+    </header>
+
+    <div class="container">
+        <div class="mypage-panel">
+            
+            <!-- 👤 アカウントセクション -->
+            <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="ui-sec-account">アカウント</span>
+                <button onclick="openModal('accountSettingsModal')" style="background:none; border:none; cursor:pointer; display:flex; padding: 5px;">
+                    <img src="image/setting.png" id="account-setting-icon" style="width:28px; height:28px;" alt="Settings">
+                </button>
+            </h2>
+
+            <div id="loggedInStatusArea" style="display: none;">
+                <div class="account-dashboard">
+                    <div class="account-header" style="justify-content: space-around;">
+                        <div class="user-name-area">
+                            <span id="userNameDisplay">---</span> <span id="ui-honorific">さん</span>
+                        </div>
+                        <div class="gold-display">
+                            <img src="image/note.png" style="height: 1.2rem; vertical-align: middle; margin-right: 5px;" alt="G">
+                            <span id="userGoldDisplay">0</span> G
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="authButtons" style="display: flex; justify-content: center; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 15px;">
+                <button class="dl-btn" id="ui-btn-auth-main" style="font-size: 1.2rem; padding: 15px 30px;" onclick="showAuthModal()">ログイン / 新規登録</button>
+            </div>
+
+            <!-- 🛒 ショップセクション -->
+            <h2 class="section-title" id="ui-sec-shop">ショップ</h2>
+            
+            <div class="tab-nav">
+                <button class="tab-btn active" id="ui-tab-normal" onclick="switchMainTab('normal')">ノーマル</button>
+                <button class="tab-btn" id="ui-tab-premium" onclick="switchMainTab('premium')">プレミアム</button>
+            </div>
+
+            <div id="tab-normal" class="tab-content active">
+                <div class="sub-tab-nav">
+                    <button class="sub-tab-btn active" id="ui-sub-normal-theme" onclick="switchSubTab('normal', 'theme')">テーマカラー</button>
+                    <button class="sub-tab-btn" id="ui-sub-normal-icon" onclick="switchSubTab('normal', 'icon')">アプリアイコン</button>
+                </div>
+                
+                <div id="normal-theme" class="tab-content active">
+                    <div class="shop-grid" id="normal-theme-list"></div>
+                </div>
+                <div id="normal-icon" class="tab-content">
+                    <div class="shop-grid" id="normal-icon-list"></div>
+                </div>
+            </div>
+
+            <div id="tab-premium" class="tab-content">
+                <div class="sub-tab-nav">
+                    <button class="sub-tab-btn active" id="ui-sub-premium-theme" onclick="switchSubTab('premium', 'theme')">テーマカラー</button>
+                    <button class="sub-tab-btn" id="ui-sub-premium-icon" onclick="switchSubTab('premium', 'icon')">アプリアイコン</button>
+                </div>
+                
+                <div id="premium-theme" class="tab-content active">
+                    <div class="shop-grid" id="premium-theme-list"></div>
+                </div>
+                <div id="premium-icon" class="tab-content">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- モーダル群 -->
+    <div class="modal-overlay" id="authModal" onclick="closeAuthModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeAuthModal()">×</button>
+            <h2 class="modal-title" id="ui-modal-auth-title">ログイン / 新規登録</h2>
+            <input type="email" id="authEmail" placeholder="メールアドレス" style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:none; outline:none;">
+            <input type="password" id="authPass" placeholder="パスワード(6文字以上)" style="width:100%; padding:10px; margin-bottom:20px; border-radius:5px; border:none; outline:none;">
+            <div class="dl-buttons" style="flex-direction: column;">
+                <button class="dl-btn" id="ui-btn-login" onclick="loginUser()">ログイン</button>
+                <button class="dl-btn" id="ui-btn-register" onclick="registerUser()">新規登録</button>
+                <button class="dl-btn" onclick="loginWithApple()"> Sign in with Apple</button>
+                <button class="dl-btn" onclick="loginWithGoogle()">G Sign in with Google</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="nameEditModal" onclick="closeNameEditModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeNameEditModal()">×</button>
+            <h2 class="modal-title" id="ui-modal-name-title">名前の変更</h2>
+            <input type="text" id="newNameInput" placeholder="新しい名前 (8文字以内)" style="width:100%; padding:10px; margin-bottom:20px; border-radius:5px; border:none; outline:none;">
+            <div style="text-align: center;">
+                <button class="dl-btn" id="ui-btn-save-name" onclick="saveNewName()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="accountSettingsModal" onclick="closeModal('accountSettingsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('accountSettingsModal')">×</button>
+            <h2 class="modal-title" id="ui-modal-setting-title">アカウント設定</h2>
+            
+            <div style="margin-bottom: 20px; text-align: center; font-size: 0.9rem; color: var(--text-sub);">
+                <span id="ui-txt-provider">ログイン方法:</span> <span id="loginProviderTextDetail">---</span>
+            </div>
+
+            <div class="dl-buttons" style="flex-direction: column; gap: 12px;">
+                <button class="dl-btn" id="ui-btn-edit-name" onclick="closeModal('accountSettingsModal'); showNameEditModal();">名前を変更する</button>
+                <button class="dl-btn" id="ui-btn-logout" style="background: rgba(255,255,255,0.05);" onclick="logoutUser()">ログアウト</button>
+                
+                <button class="dl-btn" id="ui-btn-restore" style="background: rgba(255,255,255,0.05);" onclick="restorePurchases()">購入の復元</button>
+                
+                <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;">
+                <button class="dl-btn" id="ui-btn-delete" style="border-color: var(--accent-pink); color: var(--accent-pink);" onclick="deleteUserAccount()">退会する</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // UI言語適用処理
+        function applyLanguage() {
+            if (currentLang === 'en') {
+                document.getElementById('ui-title').innerText = "My Page | Shioya Music";
+                document.getElementById('ui-back-btn').innerText = "◀ Back";
+                document.getElementById('ui-sec-account').innerText = "Account";
+                document.getElementById('ui-honorific').innerText = "";
+                document.getElementById('ui-btn-auth-main').innerText = "Login / Register";
+                document.getElementById('ui-sec-shop').innerText = "Shop";
+                
+                document.getElementById('ui-tab-normal').innerText = "Normal";
+                document.getElementById('ui-tab-premium').innerText = "Premium";
+                document.getElementById('ui-sub-normal-theme').innerText = "Theme Color";
+                document.getElementById('ui-sub-normal-icon').innerText = "App Icon";
+                document.getElementById('ui-sub-premium-theme').innerText = "Theme Color";
+                document.getElementById('ui-sub-premium-icon').innerText = "App Icon";
+
+                document.getElementById('ui-modal-auth-title').innerText = "Login / Register";
+                document.getElementById('authEmail').placeholder = "Email Address";
+                document.getElementById('authPass').placeholder = "Password (6+ chars)";
+                document.getElementById('ui-btn-login').innerText = "Login";
+                document.getElementById('ui-btn-register').innerText = "Register";
+
+                document.getElementById('ui-modal-name-title').innerText = "Change Name";
+                document.getElementById('newNameInput').placeholder = "New Name (Max 8 chars)";
+                document.getElementById('ui-btn-save-name').innerText = "Save";
+
+                document.getElementById('ui-modal-setting-title').innerText = "Account Settings";
+                document.getElementById('ui-txt-provider').innerText = "Provider:";
+                document.getElementById('ui-btn-edit-name').innerText = "Change Name";
+                document.getElementById('ui-btn-logout').innerText = "Logout";
+                document.getElementById('ui-btn-restore').innerText = "Restore Purchases";
+                document.getElementById('ui-btn-delete').innerText = "Delete Account";
+            }
+        }
+        applyLanguage();
+
+        // 1. アイテム定義（英語名 labelEn を追加）
+        const NORMAL_ICONS = [
+            { id: 'icon-default', label: 'デフォルト', labelEn: 'Default', xcode: 'default', price: 0, img: 'image/default_icon.png' },
+            { id: 'icon-komiya', label: 'こみや', labelEn: 'Komiya', xcode: 'KomiyaIcon', price: 30000, img: 'image/komiya_icon.png' },
+            { id: 'icon-shioya', label: 'しおや', labelEn: 'Shioya', xcode: 'ShioyaIcon', price: 30000, img: 'image/shioya_icon.png' },
+            { id: 'icon-happa', label: 'はっぱ', labelEn: 'Happa', xcode: 'HappaIcon', price: 30000, img: 'image/happa_icon.png' },
+            { id: 'icon-machida', label: '町田', labelEn: 'Machida', xcode: 'MachidaIcon', price: 30000, img: 'image/machida_icon.png' }
+        ];
+
+        const NORMAL_THEMES = [
+            { id: 'theme-default', label: 'カフェブラウン', labelEn: 'Cafe Brown', colors: ['#2d180f', '#1a1514', '#432517'], price: 0 },
+            { id: 'theme-forest', label: '深い森', labelEn: 'Deep Forest', colors: ['#0a1a0a', '#152d15', '#1f401f'], price: 10000 },
+            { id: 'theme-night', label: '静かな夜', labelEn: 'Quiet Night', colors: ['#0a0a1a', '#15152d', '#1f1f40'], price: 10000 },
+            { id: 'theme-passion', label: '情熱', labelEn: 'Passion', colors: ['#1a0505', '#2d0a0a', '#400f0f'], price: 10000 },
+            { id: 'theme-midnight', label: '真夜中', labelEn: 'Midnight', colors: ['#000000', '#1c1c1c', '#333333'], price: 10000 }
+        ];
+
+        const PREMIUM_THEMES = [
+            { 
+                id: 'theme-premium-komiya', label: 'こみや', labelEn: 'Komiya', 
+                colors: ['#ff9800', '#333333', '#8bc34a'], price: '¥300', rcPackageId: 'komiya',
+                cardBg: 'rgba(255, 152, 0, 0.15)', bgImage: 'image/komiya.png' 
+            },
+            { 
+                id: 'theme-premium-shioya', label: 'しおや', labelEn: 'Shioya', 
+                colors: ['#9c27b0', '#333333', '#ff9800'], price: '¥300', rcPackageId: 'shioya',
+                cardBg: 'rgba(156, 39, 176, 0.15)', bgImage: 'image/shioya.png' 
+            },
+            { 
+                id: 'theme-premium-happa', label: 'はっぱ', labelEn: 'Happa', 
+                colors: ['#000033', '#800000', '#b8860b'], price: '¥300', rcPackageId: 'happa',
+                cardBg: 'rgba(128, 0, 0, 0.15)', bgImage: 'image/a_touka.png' 
+            },
+            { 
+                id: 'theme-premium-machida', label: '町田', labelEn: 'Machida', 
+                colors: ['#e0e0e0', '#8bc34a', '#ff5e3a'], price: '¥300', rcPackageId: 'machida',
+                cardBg: 'rgba(139, 195, 74, 0.15)', bgImage: 'image/machida.png' 
+            }
+        ];
+
+        let musicData = {
+            gold: 0,
+            ownedIcons: ['icon-default'],
+            ownedThemes: ['theme-default'],
+            currentIcon: 'icon-default',
+            currentTheme: 'theme-default'
+        };
+
+        function switchMainTab(tabName) {
+            document.querySelectorAll('.tab-nav .tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-normal').classList.remove('active');
+            document.getElementById('tab-premium').classList.remove('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        function switchSubTab(mainTab, subTab) {
+            const container = document.getElementById(`tab-${mainTab}`);
+            container.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${mainTab}-${subTab}`).classList.add('active');
+        }
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                await loadMusicShopData(user);
+            } else {
+                renderShop();
+            }
+        });
+        updateSettingIcon();
+
+        async function loadMusicShopData(user) {
+            const doc = await db.collection("users").doc(user.uid).get();
+            if (doc.exists) {
+                const data = doc.data();
+                musicData.gold = data.gold || 0;
+                musicData.ownedIcons = data.ownedMusicIcons || ['icon-default'];
+                musicData.ownedThemes = data.ownedMusicThemes || ['theme-default'];
+                musicData.currentIcon = data.currentMusicIcon || 'icon-default';
+                musicData.currentTheme = data.currentMusicTheme || 'theme-default';
+                
+                document.getElementById('userGoldDisplay').innerText = musicData.gold.toLocaleString();
+                document.getElementById('userNameDisplay').innerText = data.name || (currentLang === 'en' ? "Guest" : "名無し");
+                
+                if(document.getElementById('loginProviderTextDetail')) {
+                    document.getElementById('loginProviderTextDetail').innerText = user.providerData[0].providerId;
+                }
+                
+                if (data.currentMusicTheme) {
+                    selectTheme(data.currentMusicTheme, false);
+                }
+                renderShop();
+            }
+        }
+
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('show');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('show');
+        }
+
+        function updateSettingIcon() {
+            const suffix = document.body.classList.contains('theme-premium-machida') ? '2' : '';
+            const icon = document.getElementById('account-setting-icon');
+            if (icon) icon.src = `image/setting${suffix}.png`;
+        }
+
+        function renderShop() {
+            renderGrid('normal-icon-list', NORMAL_ICONS, 'icon');
+            renderGrid('normal-theme-list', NORMAL_THEMES, 'theme');
+            renderGrid('premium-theme-list', PREMIUM_THEMES, 'theme');
+        }
+
+        function renderGrid(containerId, items, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            // 言語別テキストの用意
+            const txtEquipped = currentLang === 'en' ? 'Equipped' : '装備中';
+            const txtOwned = currentLang === 'en' ? 'Owned' : '所持済み';
+            const txtLogin = currentLang === 'en' ? 'Login Req.' : '要ログイン';
+            const txtEquip = currentLang === 'en' ? 'Equip' : '着替える';
+            const txtBuy = currentLang === 'en' ? 'Buy' : '購入する';
+            const txtFree = currentLang === 'en' ? 'Free' : '無料';
+
+            items.forEach(item => {
+                const isAuth = !!auth.currentUser;
+                const currentId = (type === 'icon') ? musicData.currentIcon : musicData.currentTheme;
+                const ownedList = (type === 'icon') ? musicData.ownedIcons : musicData.ownedThemes;
+                
+                const isOwned = ownedList.includes(item.id);
+                const isEquipped = currentId === item.id;
+                
+                let badgeHtml = '';
+                if (isEquipped) badgeHtml = `<div class="status-badge badge-equipped">${txtEquipped}</div>`;
+                else if (isOwned) badgeHtml = `<div class="status-badge badge-owned">${txtOwned}</div>`;
+
+                let previewHtml = '';
+                if (type === 'icon') {
+                    previewHtml = `<img src="${item.img}" alt="${item.label}">`;
+                } else {
+                    previewHtml = `<div class="color-circles">${item.colors.map(c => `<div class="circle" style="background: ${c}"></div>`).join('')}</div>`;
+                }
+
+                const customBgStyle = item.cardBg ? `background-color: ${item.cardBg};` : '';
+                const characterBgHtml = item.bgImage ? `
+                    <div style="
+                        position: absolute; bottom: 0; right: 0; width: 100%; height: 100%;
+                        background-image: url('${item.bgImage}');
+                        background-size: contain; background-repeat: no-repeat; background-position: right bottom;
+                        opacity: 0.3; z-index: 1; pointer-events: none;
+                    "></div>` : '';
+
+                let btnHtml = '';
+                let btnAction = '';
+                const itemName = currentLang === 'en' ? item.labelEn : item.label;
+
+                if (!isAuth && item.price > 0 && !item.rcPackageId) {
+                    btnHtml = `<button class="dl-btn" style="width: 100%; opacity: 0.5; position: relative; z-index: 2;" disabled>${txtLogin}</button>`;
+                } else if (isEquipped) {
+                    btnHtml = `<button class="dl-btn" style="width: 100%; opacity: 0.5; border-color: var(--accent-orange); position: relative; z-index: 2;" disabled>${txtEquipped}</button>`;
+                } else if (isOwned) {
+                    btnAction = `equipMusicItem('${item.id}', '${type}', '${item.xcode || ''}')`;
+                    btnHtml = `<button class="dl-btn" style="width: 100%; position: relative; z-index: 2;" onclick="${btnAction}">${txtEquip}</button>`;
+                } else {
+                    if (item.rcPackageId) {
+                        btnAction = `buyPremiumItem('${item.id}', '${item.rcPackageId}', '${itemName}')`;
+                    } else {
+                        btnAction = `buyMusicItem('${item.id}', '${type}', ${item.price}, '${itemName}')`;
+                    }
+                    btnHtml = `<button class="dl-btn" style="width: 100%; position: relative; z-index: 2;" onclick="${btnAction}">${txtBuy}</button>`;
+                }
+
+                let priceText = '';
+                if (item.rcPackageId) {
+                    priceText = `<div class="card-price free" style="position: relative; z-index: 2; color: var(--accent-pink);">${item.price}</div>`;
+                } else {
+                    priceText = item.price === 0 ? `<span class="card-price free" style="position: relative; z-index: 2;">${txtFree}</span>` : `<div class="card-price" style="position: relative; z-index: 2;">${item.price.toLocaleString()}G</div>`;
+                }
+
+                const div = document.createElement('div');
+                div.className = `shop-card ${isEquipped ? 'equipped' : ''} ${isOwned ? 'owned' : ''}`;
+                if (customBgStyle) div.style.cssText = customBgStyle;
+                
+                div.innerHTML = `
+                    ${characterBgHtml}
+                    ${badgeHtml}
+                    <div class="card-preview" style="position: relative; z-index: 2;">${previewHtml}</div>
+                    <div class="card-title" style="position: relative; z-index: 2;">${itemName}</div>
+                    ${priceText}
+                    <div style="margin-top: auto; position: relative; z-index: 2;">${btnHtml}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function buyMusicItem(itemId, type, price, label) {
+            const confirmMsg = currentLang === 'en' 
+                ? `Buy "${label}" for ${price.toLocaleString()} G?` 
+                : `${price.toLocaleString()} G を消費して「${label}」を購入しますか？`;
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const purchaseFunc = firebase.app().functions("asia-northeast1").httpsCallable('purchaseMusicIcon');
+                const result = await purchaseFunc({ itemId: itemId, itemType: type, price: price });
+
+                if (result.data.success) {
+                    showToast(currentLang === 'en' ? "Purchase successful!" : "購入しました！");
+                    if (type === 'icon') musicData.ownedIcons.push(itemId);
+                    else musicData.ownedThemes.push(itemId);
+                    musicData.gold = result.data.newGold;
+                    document.getElementById('userGoldDisplay').innerText = musicData.gold.toLocaleString();
+                    
+                    const allItems = type === 'icon' ? NORMAL_ICONS : [...NORMAL_THEMES, ...PREMIUM_THEMES];
+                    const purchasedItem = allItems.find(i => i.id === itemId);
+                    equipMusicItem(itemId, type, purchasedItem.xcode);
+                } else {
+                    showToast((currentLang === 'en' ? "Error: " : "エラー: ") + result.data.message);
+                }
+            } catch (e) {
+                showToast(currentLang === 'en' ? "Communication error" : "通信エラーが発生しました");
+            }
+        }
+
+        async function buyPremiumItem(itemId, packageId, label) {
+            const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+            
+            if (!isNative) {
+                showToast(currentLang === 'en' ? "Purchases are only available in the iOS app." : "決済はiOSアプリ版からのみご利用いただけます。");
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (!user) {
+                showToast(currentLang === 'en' ? "Login required to purchase." : "購入するにはログインが必要です。");
+                return;
+            }
+
+            const Purchases = window.Capacitor.Plugins.Purchases;
+
+            try {
+                showToast(currentLang === 'en' ? "Fetching product info..." : "商品情報を取得中...");
+                
+                const offerings = await Purchases.getOfferings();
+                if (!offerings.current || offerings.current.availablePackages.length === 0) {
+                    showToast(currentLang === 'en' ? "Product not found." : "商品が見つかりません。");
+                    return;
+                }
+
+                const packageToBuy = offerings.current.availablePackages.find(p => p.identifier === packageId);
+                if (!packageToBuy) {
+                    showToast(currentLang === 'en' ? "Specified product not found." : "指定された商品が見つかりません。");
+                    return;
+                }
+
+                const { customerInfo } = await Purchases.purchasePackage({ aPackage: packageToBuy });
+                const entitlementId = itemId.replace('theme-premium-', 'entitlement_'); 
+
+                if (typeof customerInfo.entitlements.active[entitlementId] !== "undefined") {
+                    showToast(currentLang === 'en' ? `Purchased "${label}"! Thank you!` : `「${label}」を購入しました！ありがとうございます！`);
+                    
+                    musicData.ownedThemes.push(itemId);
+                    await db.collection("users").doc(user.uid).update({
+                        ownedMusicThemes: firebase.firestore.FieldValue.arrayUnion(itemId)
+                    });
+                    
+                    equipMusicItem(itemId, 'theme', null);
+                }
+            } catch (e) {
+                if (!e.userCancelled) {
+                    showToast((currentLang === 'en' ? "Error occurred: " : "エラーが発生しました: ") + e.message);
+                } else {
+                    showToast(currentLang === 'en' ? "Purchase cancelled." : "購入をキャンセルしました。");
+                }
+            }
+        }
+
+        async function restorePurchases() {
+            const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+            if (!isNative) {
+                showToast(currentLang === 'en' ? "Restore is only available in the iOS app." : "復元機能はiOSアプリ版でのみ利用可能です。");
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (!user) {
+                showToast(currentLang === 'en' ? "Login required to restore." : "復元するにはログインが必要です。");
+                return;
+            }
+
+            const Purchases = window.Capacitor.Plugins.Purchases;
+
+            try {
+                showToast(currentLang === 'en' ? "Checking purchase history..." : "購入履歴を照合中...");
+                
+                const { customerInfo } = await Purchases.restorePurchases();
+                const themeIds = ['theme-premium-komiya', 'theme-premium-shioya', 'theme-premium-happa', 'theme-premium-machida'];
+                let restoredCount = 0;
+
+                for (const itemId of themeIds) {
+                    const entitlementId = itemId.replace('theme-premium-', 'entitlement_');
+                    
+                    if (!musicData.ownedThemes.includes(itemId) && 
+                        typeof customerInfo.entitlements.active[entitlementId] !== "undefined") {
+                        
+                        musicData.ownedThemes.push(itemId);
+                        restoredCount++;
+                    }
+                }
+
+                if (restoredCount > 0) {
+                    await db.collection("users").doc(user.uid).update({
+                        ownedMusicThemes: musicData.ownedThemes
+                    });
+                    showToast(currentLang === 'en' ? `Restored ${restoredCount} items!` : `${restoredCount} 件の購入情報を復元しました！`);
+                    renderShop(); 
+                } else {
+                    showToast(currentLang === 'en' ? "No restore data found." : "復元できる購入情報が見つかりませんでした。");
+                }
+                
+                closeModal('accountSettingsModal');
+            } catch (e) {
+                showToast(currentLang === 'en' ? "Error during restore." : "復元中にエラーが発生しました。");
+            }
+        }
+
+        async function equipMusicItem(itemId, type, xcode) {
+            const user = auth.currentUser;
+            if(!user) return;
+            
+            const updateData = {};
+            if (type === 'icon') {
+                updateData.currentMusicIcon = itemId;
+                musicData.currentIcon = itemId;
+                if(xcode) await changeAppIcon(xcode);
+            } else {
+                updateData.currentMusicTheme = itemId;
+                musicData.currentTheme = itemId;
+                selectTheme(itemId); 
+            }
+
+            await db.collection("users").doc(user.uid).update(updateData);
+            renderShop(); 
+        }
+
+        function selectTheme(themeName, notify = true) {
+            document.documentElement.className = themeName;
+            document.body.className = themeName;
+            localStorage.setItem('shioyaMusic_theme', themeName);
+            updateSettingIcon(); 
+            if(notify) showToast(currentLang === 'en' ? "Theme changed" : "テーマを変更しました");
+        }
+
+        async function changeAppIcon(iconName) {
+            const capPlugins = (window.Capacitor && window.Capacitor.Plugins) ? window.Capacitor.Plugins : {};
+            if (capPlugins.AppIconPlugin) {
+                try {
+                    await capPlugins.AppIconPlugin.changeIcon({ iconName: iconName });
+                    showToast(currentLang === 'en' ? "Icon changed" : "アイコンを変更しました");
+                } catch (e) {
+                    showToast(currentLang === 'en' ? "Failed to change icon" : "アイコン変更失敗");
+                }
+            }
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                toast.style.transition = '0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

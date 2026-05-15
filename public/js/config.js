@@ -1,0 +1,4 @@
+const SHIOYA_CONFIG = {
+    REVENUECAT_API_KEY: "appl_jPLIIyMeOuayweKuXRIjYYOAjlV",
+    FIREBASE_API_KEY: "AIzaSyCUjxd4L8mnnBw6RRvvimbMZ_V1BaRZxQw" 
+};
