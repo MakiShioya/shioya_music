@@ -31,6 +31,43 @@
             filter: grayscale(1);
             cursor: not-allowed;
         }
+
+        /* ==========================================
+           ✅ ロード画面用スタイル
+           ========================================== */
+        .loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        .loading-screen.hidden {
+            opacity: 0; visibility: hidden; pointer-events: none;
+        }
+        .loading-content {
+            text-align: center; color: var(--text-main); padding: 20px; width: 90%; max-width: 400px;
+        }
+        .loading-spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-orange);
+            border-radius: 50%;
+            animation: loading-spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+        .loading-title {
+            font-family: 'SetoFont', sans-serif;
+            font-size: 1.6rem; font-weight: bold; color: var(--title-color);
+            margin-bottom: 30px; letter-spacing: 3px; text-transform: uppercase;
+        }
+        .loading-tips {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px; border-radius: 8px; font-size: 0.95rem; line-height: 1.6;
+            text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        @keyframes loading-spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="theme-default">
@@ -39,6 +76,13 @@
         document.body.className = localStorage.getItem('shioyaMusic_theme') || 'theme-default';
     </script>
 
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-title" id="loadingTitle">tips</div>
+            <div class="loading-tips" id="loadingTips">音楽を読み込んでいます...</div>
+        </div>
+    </div>
     <header>
         <div class="logo">♪ SHIOYA MUSIC</div>
         <div class="header-controls">
@@ -49,7 +93,6 @@
     </header>
 
     <div class="container">
-        <!-- プレイヤーエリア -->
         <div class="player-section">
             <div class="art-container" id="artContainer">
                 <img id="coverArt" src="image/mini_komiya_400px.png" alt="Cover Art">
@@ -119,22 +162,18 @@
             <div class="next-up" id="nextUpDisplay">Next: --</div>
         </div>
 
-        <!-- プレイリストエリア -->
         <div class="playlist-section">
             <div class="playlist-header" style="align-items: center;">
                 <span class="playlist-title" id="ui-playlist-title">プレイリスト</span>
-                <!-- ▼ お気に入りのみフィルターボタンを追加 ▼ -->
                 <button class="btn-action" id="btnFilterFavorite" onclick="toggleFavoriteFilter()" title="お気に入りのみ表示">
                     <img src="image/hart.png" class="icon-img" id="filterFavoriteIcon" alt="Filter">
                 </button>
             </div>
             <div class="track-list" id="playlist">
-                <!-- JSで動的に生成 -->
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- モーダル群 -->
     <div class="modal-overlay" id="infoModal" onclick="closeModal('infoModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal('infoModal')">×</button>
@@ -151,7 +190,6 @@
         </div>
     </div>
 
-    <!-- ダウンロード確認・削除モーダル -->
     <div class="modal-overlay" id="downloadModal" onclick="closeModal('downloadModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal('downloadModal')">×</button>
@@ -165,41 +203,54 @@
         </div>
     </div>
 
-    <!-- 設定モーダル -->
-    <div class="modal-overlay" id="settingsModal" onclick="closeModal('settingsModal')">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="closeModal('settingsModal')">×</button>
-        <h2 class="modal-title" id="ui-modal-settings">設定</h2>
-        
-        <div class="settings-row">
-            <span id="ui-settings-lang-label">言語 (Language)</span>
-            <select id="langSelect" style="padding: 8px; border-radius: 5px; cursor:pointer;" onchange="changeLang()">
-                <option value="ja">日本語</option>
-                <option value="en">English</option>
-            </select>
+    <div class="modal-overlay" id="imagePreloadModal" onclick="closeModal('imagePreloadModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('imagePreloadModal')">×</button>
+            <h2 class="modal-title" id="ui-image-download-title">追加データのダウンロード</h2>
+            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; font-size: 1.05rem; line-height: 1.8; margin-bottom: 20px;" id="ui-image-download-desc">
+                アプリを快適に利用するため、高画質なカバー画像データのダウンロードを行いますか？（オフラインでもすぐに美しい画像が表示されるようになります。）<br><br>
+                <span style="color: var(--accent-orange); font-weight: bold;">追加容量: 約 <span id="preloadImageSize">0</span> MB</span>
+            </div>
+            <div class="dl-buttons" style="margin-top: 0;">
+                <button class="dl-btn" onclick="executeImagePreload()">ダウンロード</button>
+                <button class="dl-btn" style="background: rgba(255,255,255,0.05);" onclick="closeModal('imagePreloadModal')">後でする</button>
+            </div>
         </div>
-
-<div class="settings-row">
-    <span id="ui-settings-bg-label">バックグラウンド再生</span>
-    <select id="bgPlaySelect" style="padding: 8px; border-radius: 5px; cursor:pointer;" onchange="changeBackgroundPlay()">
-        <option value="on">ON</option>
-        <option value="off">OFF</option>
-    </select>
-</div>
-
-        <div class="settings-row">
-    <span id="ui-settings-char-label">キャラクター</span>
-    <select id="charSelect" style="padding: 8px; border-radius: 5px; cursor:pointer;" onchange="changeCharacter()">
-        <option value="random" id="ui-char-random">ランダム</option>
-        <option value="komiya" id="ui-char-komiya">こみや</option>
-        <option value="shioya" id="ui-char-shioya">しおや</option>
-        <option value="machida" id="ui-char-machida">町田</option>
-    </select>
-</div>
     </div>
-</div>
 
-    <!-- ヘルプモーダル -->
+    <div class="modal-overlay" id="settingsModal" onclick="closeModal('settingsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('settingsModal')">×</button>
+            <h2 class="modal-title" id="ui-modal-settings">設定</h2>
+            
+            <div class="settings-row">
+                <span id="ui-settings-lang-label">言語 (Language)</span>
+                <select id="langSelect" style="padding: 8px; border-radius: 5px; cursor:pointer;" onchange="changeLang()">
+                    <option value="ja">日本語</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <div class="settings-row">
+                <span id="ui-settings-bg-label">バックグラウンド再生</span>
+                <select id="bgPlaySelect" style="padding: 8px; border-radius: 5px; cursor:pointer;" onchange="changeBackgroundPlay()">
+                    <option value="on">ON</option>
+                    <option value="off">OFF</option>
+                </select>
+            </div>
+
+            <div class="settings-row">
+                <span id="ui-settings-char-label">キャラクター</span>
+                <select id="charSelect" style="padding: 8px; border-radius: 5px; cursor:pointer;" onchange="changeCharacter()">
+                    <option value="random" id="ui-char-random">ランダム</option>
+                    <option value="komiya" id="ui-char-komiya">こみや</option>
+                    <option value="shioya" id="ui-char-shioya">しおや</option>
+                    <option value="machida" id="ui-char-machida">町田</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="helpModal" onclick="closeModal('helpModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal('helpModal')">×</button>
@@ -215,30 +266,28 @@
         </div>
     </div>
 
-    <!-- トースト通知・お知らせ -->
     <div class="toast-container" id="toastContainer"></div>
     <div class="modal-overlay" id="noticeModal" onclick="closeNoticeModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="closeNoticeModal()">×</button>
-        <h2 class="modal-title" id="ui-notice-title">お知らせ</h2>
-        <div id="ui-notice-desc" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; font-size: 1.05rem; line-height: 1.8; white-space: pre-wrap;">
-            お使いの環境によっては通信状況により楽曲の読み込みにお時間がかかる場合があります。ダウンロード機能を活用すると快適に再生できます。\n\n楽譜・MIDIデータのダウンロード機能は現在準備中です。順次配信予定です。
-        </div>
-        
-        <!-- ▼ チェックボックスを追加 ▼ -->
-        <div style="margin-top: 15px; text-align: left; font-size: 0.9rem; color: var(--text-main);">
-            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="stopNoticeToday" style="width: 18px; height: 18px; cursor: pointer;">
-                <span id="ui-stop-notice-label">今日はもう表示しない</span>
-            </label>
-        </div>
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeNoticeModal()">×</button>
+            <h2 class="modal-title" id="ui-notice-title">お知らせ</h2>
+            
+            <div id="ui-notice-desc" style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; font-size: 1.05rem; line-height: 1.8;">
+                一部の環境ではアプリ内の音量調整機能が使えない場合があります。その際は端末の音量ボタンで調整してください。<br><br>楽譜・MIDIデータのダウンロード機能は現在準備中です。順次配信予定です。
+            </div>
+            
+            <div style="margin-top: 15px; text-align: left; font-size: 0.9rem; color: var(--text-main);">
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="stopNoticeToday" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span id="ui-stop-notice-label">今日はもう表示しない</span>
+                </label>
+            </div>
 
-        <div style="margin-top: 20px; text-align: center;">
-            <!-- onclick を新設した closeNoticeModal() に変更 -->
-            <button class="dl-btn" onclick="closeNoticeModal()">OK</button>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="dl-btn" onclick="closeNoticeModal()">OK</button>
+            </div>
         </div>
     </div>
-</div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -248,6 +297,57 @@
     <script src="js/auth.js"></script>
 
     <script>
+        // ==========================================
+        // ✅ 変更しない固定URLを作成する関数
+        // ==========================================
+        function getCacheKey(imageID) {
+            return `https://shioya-music.local/image/${encodeURIComponent(imageID)}`;
+        }
+
+        // ==========================================
+        // ▼▼ ロード画面用 Tips処理 ▼▼
+        // ==========================================
+        const appTips = {
+            ja: [
+                "音楽を再生したまま画面を開いておくと、1日最大3600Gまでポイントが貯まります。",
+                "「購入の復元」はマイページのアカウント設定から行えます。",
+                "楽曲画面でダウンロードしておけば、オフラインでも通信量を気にせず聴けます。",
+                "気分に合わせてテーマカラーを着せ替えてみましょう！",
+                "お気に入りの曲は、ハートマークを押してリストにまとめられます。"
+            ],
+            en: [
+                "Keep the app open while playing music to earn up to 3600G daily.",
+                "You can restore purchases from the Account Settings on My Page.",
+                "Downloaded tracks can be played offline without using mobile data.",
+                "Change the theme color to match your current mood!",
+                "Tap the heart icon to save your favorite tracks to a special list."
+            ]
+        };
+
+        function initLoadingScreen() {
+            const lang = localStorage.getItem('shioyaMusic_lang') || 'ja';
+            const titleEl = document.getElementById('loadingTitle');
+            if (titleEl) titleEl.textContent = lang === 'en' ? 'Tips' : 'Tips';
+
+            const tipsList = appTips[lang] || appTips['ja'];
+            const randomTip = tipsList[Math.floor(Math.random() * tipsList.length)];
+            
+            const tipsEl = document.getElementById('loadingTips');
+            if (tipsEl) tipsEl.textContent = randomTip;
+        }
+
+        function hideLoadingScreen() {
+            const screen = document.getElementById('loadingScreen');
+            if (screen) {
+                setTimeout(() => {
+                    screen.classList.add('hidden');
+                }, 400);
+            }
+        }
+
+        initLoadingScreen();
+        // ==========================================
+
         CloudKit.configure({
             containers: [{
                 containerIdentifier: 'iCloud.com.shioyasoft.music',
@@ -267,7 +367,7 @@
         let loopMode = 0; 
         let showRemainingTime = false;
         
-        let isFavoriteFilter = false; // ▼ 追加：お気に入りフィルターの状態
+        let isFavoriteFilter = false;
 
         const savedLikes = JSON.parse(localStorage.getItem('shioyaMusic_likes') || '[]');
         const likedTracks = new Set(savedLikes);
@@ -323,13 +423,11 @@
             document.getElementById('icon-shuffle').src = `image/shuffle${suffix}.png`;
             document.getElementById('icon-loop').src = `image/loop${suffix}.png`;
 
-            // フィルターアイコンのテーマ反映
             if (!isFavoriteFilter) {
                 const filterIcon = document.getElementById('filterFavoriteIcon');
                 if (filterIcon) filterIcon.src = `image/hart${suffix}.png`;
             }
 
-            // いいねボタンのテーマ反映
             if (!likedTracks.has(currentIndex)) {
                 const likeIcn = document.getElementById('likeIcon');
                 if (likeIcn) likeIcn.src = `image/hart${suffix}.png`;
@@ -353,20 +451,19 @@
 
         async function init() {
             const savedBgPlay = localStorage.getItem('shioyaMusic_bgPlay') || 'on';
-const bgSelect = document.getElementById('bgPlaySelect');
-if(bgSelect) bgSelect.value = savedBgPlay;
+            const bgSelect = document.getElementById('bgPlaySelect');
+            if(bgSelect) bgSelect.value = savedBgPlay;
             const savedChar = localStorage.getItem('shioyaMusic_character') || 'random';
-document.getElementById('charSelect').value = savedChar;
-    const savedLang = localStorage.getItem('shioyaMusic_lang');
-    if (savedLang) {
-        document.getElementById('langSelect').value = savedLang;
-        changeLang(true); 
-    }
-    
-    applyThemeIcons();
+            document.getElementById('charSelect').value = savedChar;
+            
+            const savedLang = localStorage.getItem('shioyaMusic_lang');
+            if (savedLang) {
+                document.getElementById('langSelect').value = savedLang;
+                changeLang(true); 
+            }
+            
+            applyThemeIcons();
             try {
-                showToast("楽曲リストを読み込み中...");
-                
                 const query = { recordType: 'Song' };
                 const response = await publicDatabase.performQuery(query);
                 
@@ -380,7 +477,9 @@ document.getElementById('charSelect').value = savedChar;
                             cloudCover: fields.cover ? fields.cover.value.downloadURL : "",
                             img: fields.cover ? fields.cover.value.downloadURL : "image/mini_komiya_400px.png",
                             desc: fields.description ? fields.description.value : "楽曲の解説を準備中です。",
-                            order: fields.order ? fields.order.value : 999 
+                            order: fields.order ? fields.order.value : 999,
+                            coverSize: fields.coverSize ? fields.coverSize.value : 2357, 
+                            imageID: fields.imageID ? fields.imageID.value : (fields.cover ? fields.cover.value.downloadURL : "")
                         };
                     });
                     tempTrackData.sort((a, b) => a.order - b.order);
@@ -407,13 +506,16 @@ document.getElementById('charSelect').value = savedChar;
             }
             
             const lastNoticeDate = localStorage.getItem('shioyaMusic_lastNoticeDate');
-    const today = new Date().toLocaleDateString();
+            const today = new Date().toLocaleDateString();
 
-    // 「オンライン」かつ「保存された日付が今日ではない」場合のみ表示
-    if (navigator.onLine && lastNoticeDate !== today) {
-        openModal('noticeModal');
-    }
-}
+            if (navigator.onLine && lastNoticeDate !== today) {
+                openModal('noticeModal');
+            } else {
+                checkAndShowImagePreload();
+            }
+
+            hideLoadingScreen();
+        }
 
         function renderPlaylist() {
             updatePlaylistTitle(); 
@@ -421,7 +523,6 @@ document.getElementById('charSelect').value = savedChar;
             const isOffline = !navigator.onLine;
 
             trackData.forEach((track, index) => {
-                // フィルターがONで、いいねされていなければ表示しない
                 if (isFavoriteFilter && !likedTracks.has(index)) return;
 
                 const item = document.createElement('div');
@@ -431,12 +532,10 @@ document.getElementById('charSelect').value = savedChar;
                 item.className = `track-item ${index === currentIndex ? 'playing' : ''} ${isDownloaded ? 'downloaded' : ''} ${notPlayable ? 'not-playable' : ''}`;
                 item.onclick = notPlayable ? null : () => { playSpecificTrack(index); };
                 
-                // ▼ 修正点1: ハートアイコンに flex-shrink: 0 を追加し、潰れないように保護
                 const likeMark = likedTracks.has(index) ? '<img src="image/like.png" style="width:16px; height:16px; margin-left:8px; flex-shrink:0; object-fit:contain;">' : '';
                 
-                // ▼ 修正点2: タイトルとアイコンを横並びにする Flexbox のラッパーを追加
                 item.innerHTML = `
-                    <img src="${track.img}" class="track-item-img" alt="icon">
+                    <img src="" class="track-item-img" id="playlist-img-${index}" alt="icon" style="display: none;">
                     <div class="track-item-info">
                         <div style="display: flex; align-items: center; margin-bottom: 2px;">
                             <div class="track-item-title" style="margin-bottom: 0; flex-shrink: 1; min-width: 0;">${track.title}</div>
@@ -447,44 +546,56 @@ document.getElementById('charSelect').value = savedChar;
                     <img src="image/note.png" class="track-item-playing-icon" alt="note">
                 `;
                 playlistEl.appendChild(item);
+
+                if ('caches' in window && track.imageID) {
+                    caches.open('shioya-music-images').then(cache => cache.match(getCacheKey(track.imageID)))
+                    .then(response => {
+                        if (response) return response.blob();
+                    })
+                    .then(blob => {
+                        if (blob) {
+                            const imgEl = document.getElementById(`playlist-img-${index}`);
+                            if (imgEl) {
+                                imgEl.src = URL.createObjectURL(blob);
+                                imgEl.style.display = 'block';
+                            }
+                        }
+                    }).catch(e => console.error(e));
+                }
             });
         }
 
+        // ✅ 修正：余計なおせっかいコードを削除し、常にキャラクター画像が設定されるように戻しました
+        function updateCoverArt() {
+            const char = localStorage.getItem('shioyaMusic_character') || 'random';
+            const charMap = {
+                'komiya': "image/mini_komiya_400px.png",
+                'shioya': "image/mini_shioya_400px.png",
+                'machida': "image/mini_machida_400px.png"
+            };
+
+            if (char === 'random') {
+                const characters = ["image/mini_komiya_400px.png", "image/mini_machida_400px.png", "image/mini_shioya_400px.png"];
+                coverArt.src = characters[Math.floor(Math.random() * characters.length)];
+            } else {
+                coverArt.src = charMap[char];
+            }
+        }
+
         function changeCharacter() {
-    const char = document.getElementById('charSelect').value;
-    localStorage.setItem('shioyaMusic_character', char);
-    
-    // 現在再生中の曲の画像も即座に反映させる
-    updateCoverArt();
-    
-    const lang = document.getElementById('langSelect').value;
-    showToast(lang === 'en' ? "Character set!" : "キャラクターを設定しました");
-}
-function changeBackgroundPlay() {
-    const val = document.getElementById('bgPlaySelect').value;
-    localStorage.setItem('shioyaMusic_bgPlay', val);
-    
-    const lang = document.getElementById('langSelect').value;
-    showToast(lang === 'en' ? "Settings updated" : "設定を更新しました");
-}
+            const char = document.getElementById('charSelect').value;
+            localStorage.setItem('shioyaMusic_character', char);
+            updateCoverArt();
+            const lang = document.getElementById('langSelect').value;
+            showToast(lang === 'en' ? "Character set!" : "キャラクターを設定しました");
+        }
 
-
-// カバー画像だけを更新するヘルパー関数
-function updateCoverArt() {
-    const char = localStorage.getItem('shioyaMusic_character') || 'random';
-    const charMap = {
-        'komiya': "image/mini_komiya_400px.png",
-        'shioya': "image/mini_shioya_400px.png",
-        'machida': "image/mini_machida_400px.png"
-    };
-
-    if (char === 'random') {
-        const characters = ["image/mini_komiya_400px.png", "image/mini_machida_400px.png", "image/mini_shioya_400px.png"];
-        coverArt.src = characters[Math.floor(Math.random() * characters.length)];
-    } else {
-        coverArt.src = charMap[char];
-    }
-}
+        function changeBackgroundPlay() {
+            const val = document.getElementById('bgPlaySelect').value;
+            localStorage.setItem('shioyaMusic_bgPlay', val);
+            const lang = document.getElementById('langSelect').value;
+            showToast(lang === 'en' ? "Settings updated" : "設定を更新しました");
+        }
 
         async function loadTrack(index) {
             const track = trackData[index];
@@ -525,7 +636,6 @@ function updateCoverArt() {
             playAudio();
         }
 
-        // ▼ 再生可能（表示中）のインデックスだけを取得する関数 ▼
         function getValidIndices() {
             if (!isFavoriteFilter) return trackData.map((_, i) => i);
             return trackData.map((_, i) => i).filter(i => likedTracks.has(i));
@@ -547,7 +657,7 @@ function updateCoverArt() {
                 const currentPos = validIndices.indexOf(currentIndex);
                 let prevPos;
                 if (currentPos === -1) {
-                    prevPos = validIndices.length - 1; // フィルター外なら最後へ
+                    prevPos = validIndices.length - 1; 
                 } else {
                     prevPos = (currentPos - 1 + validIndices.length) % validIndices.length;
                 }
@@ -567,7 +677,7 @@ function updateCoverArt() {
 
             const currentPos = validIndices.indexOf(currentIndex);
             if (currentPos === -1) {
-                return validIndices[0]; // フィルター外なら最初へ
+                return validIndices[0]; 
             }
             return validIndices[(currentPos + 1) % validIndices.length];
         }
@@ -578,6 +688,13 @@ function updateCoverArt() {
                 nextUpDisplay.textContent = `Next: --`;
                 return;
             }
+
+            // ✅ 追加: シャッフルがONの場合は「???」を表示して終了する
+            if (isShuffle) {
+                nextUpDisplay.textContent = `Next: ???`;
+                return;
+            }
+
             const nextIdx = getNextIndex();
             nextUpDisplay.textContent = `Next: ${trackData[nextIdx].title}`;
         }
@@ -637,61 +754,147 @@ function updateCoverArt() {
             }
         });
 
-        // ==========================================
-        // ▼▼ ミュージックゴールド獲得（バケツ）ロジック ▼▼
-        // ==========================================
-        let accumulatedGold = 0;      // バケツの中に貯まった秒数（1秒＝1G）
-        let lastPlayTime = 0;         // 前回計算時の再生位置（シーク飛ばし対策用）
-        let isSyncingGold = false;    // 通信中フラグ
+        let imagesToPreload = [];
 
-        // 曲が再生・シークされた時に、基準点をリセットする
+        async function checkAndShowImagePreload() {
+            if (!navigator.onLine || trackData.length === 0) return;
+            if (!('caches' in window)) return;
+
+            try {
+                const cache = await caches.open('shioya-music-images');
+                
+                let savedImageIDs = JSON.parse(localStorage.getItem('shioyaMusic_savedImageIDs') || '[]');
+                
+                const currentImageIDs = trackData.map(track => track.imageID).filter(id => id);
+                let updatedSavedIDs = savedImageIDs.filter(id => currentImageIDs.includes(id));
+                
+                const cachedRequests = await cache.keys();
+                for (const req of cachedRequests) {
+                    const isOldFormat = !req.url.startsWith('https://shioya-music.local/image/');
+                    if (isOldFormat) {
+                        await cache.delete(req);
+                        console.log("🧹 古い仕様のキャッシュを強制削除しました:", req.url);
+                        continue;
+                    }
+
+                    const cachedID = decodeURIComponent(req.url.split('/').pop());
+                    if (!currentImageIDs.includes(cachedID)) {
+                        await cache.delete(req);
+                        console.log("🧹 不要な画像キャッシュを削除しました:", cachedID);
+                    }
+                }
+                localStorage.setItem('shioyaMusic_savedImageIDs', JSON.stringify(updatedSavedIDs));
+
+                imagesToPreload = [];
+                let totalSizeKb = 0;
+                let seenImageIDs = new Set(); 
+
+                trackData.forEach(track => {
+                    if (track.cloudCover && track.imageID) {
+                        if (!updatedSavedIDs.includes(track.imageID) && !seenImageIDs.has(track.imageID)) {
+                            seenImageIDs.add(track.imageID);
+                            imagesToPreload.push({ url: track.cloudCover, id: track.imageID });
+                            totalSizeKb += track.coverSize; 
+                        }
+                    }
+                });
+
+                if (imagesToPreload.length > 0) {
+                    const estimatedSizeMb = (totalSizeKb / 1024).toFixed(1);
+                    const sizeEl = document.getElementById('preloadImageSize');
+                    if (sizeEl) sizeEl.textContent = estimatedSizeMb;
+
+                    const lang = localStorage.getItem('shioyaMusic_lang') || 'ja';
+                    if (lang === 'en') {
+                        document.getElementById('ui-image-download-title').textContent = "Download Additional Data";
+                        document.getElementById('ui-image-download-desc').innerHTML = 
+                            `Would you like to download high-quality cover images for a smoother experience? (Enables instant image loading offline.)<br><br><span style="color: var(--accent-orange); font-weight: bold;">Size: approx. ${estimatedSizeMb} MB</span>`;
+                    }
+
+                    openModal('imagePreloadModal');
+                }
+            } catch (e) {
+                console.error("画像キャッシュ同期に失敗しました:", e);
+            }
+        }
+
+        async function executeImagePreload() {
+            closeModal('imagePreloadModal');
+            if (imagesToPreload.length === 0) return;
+
+            const lang = localStorage.getItem('shioyaMusic_lang') || 'ja';
+            showToast(lang === 'en' ? "Downloading images in background..." : "バックグラウンドで画像データのロードを開始しました...");
+
+            try {
+                const cache = await caches.open('shioya-music-images');
+                let savedImageIDs = JSON.parse(localStorage.getItem('shioyaMusic_savedImageIDs') || '[]');
+
+                for (const item of imagesToPreload) {
+                    try {
+                        const response = await fetch(item.url);
+                        if(response.ok || response.type === 'opaque') {
+                            await cache.put(getCacheKey(item.id), response);
+                            if (!savedImageIDs.includes(item.id)) {
+                                savedImageIDs.push(item.id);
+                            }
+                        }
+                    } catch (err) {
+                        console.error("個別画像の取得失敗:", item.url, err);
+                    }
+                }
+                
+                localStorage.setItem('shioyaMusic_savedImageIDs', JSON.stringify(savedImageIDs));
+                
+                console.log(`🖼 画像のプリロード重複排除同期が完了しました`);
+                renderPlaylist(); 
+            } catch (e) {
+                console.error("プリロード実行エラー:", e);
+            }
+        }
+
+        let accumulatedGold = 0;      
+        let lastPlayTime = 0;         
+        let isSyncingGold = false;    
+
         audio.addEventListener('play', () => { lastPlayTime = audio.currentTime; });
         audio.addEventListener('seeked', () => { lastPlayTime = audio.currentTime; });
 
         audio.addEventListener('timeupdate', () => {
-            // ① 画面がバックグラウンドに隠れている間は一切カウントしない
             if (document.hidden) {
-                lastPlayTime = audio.currentTime; // 基準点だけ更新しておく
+                lastPlayTime = audio.currentTime; 
                 return;
             }
 
-            // ② 今回の更新で進んだ秒数（差分）を計算
             const currentTime = audio.currentTime;
             const delta = currentTime - lastPlayTime;
             
-            // 差分が正の数で、かつ2秒未満の時だけ「正常な再生」とみなしてバケツに入れる
-            // （マイナスは巻き戻し、大きすぎるのは早送りによるチートとみなす）
             if (delta > 0 && delta < 2) { 
                 accumulatedGold += delta;
             }
             lastPlayTime = currentTime;
 
-            // ③ バケツに 60G（60秒分）貯まったら、サーバーに関所を通しに行く
             if (accumulatedGold >= 60 && !isSyncingGold) {
                 syncGoldToDatabase(60);
             }
         });
         document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-        // --- ゴールド獲得用の処理 (既存) ---
-        if (accumulatedGold >= 10 && !isSyncingGold) {
-            syncGoldToDatabase(Math.floor(accumulatedGold));
-        }
+            if (document.hidden) {
+                if (accumulatedGold >= 10 && !isSyncingGold) {
+                    syncGoldToDatabase(Math.floor(accumulatedGold));
+                }
 
-        // --- ▼ バックグラウンド再生停止の処理を追加 ▼ ---
-        const bgSetting = localStorage.getItem('shioyaMusic_bgPlay') || 'on';
-        if (bgSetting === 'off' && isPlaying) {
-            pauseAudio(); // 設定がOFFで再生中なら一時停止する
-        }
-    } else {
-        lastPlayTime = audio.currentTime;
-    }
-});
+                const bgSetting = localStorage.getItem('shioyaMusic_bgPlay') || 'on';
+                if (bgSetting === 'off' && isPlaying) {
+                    pauseAudio(); 
+                }
+            } else {
+                lastPlayTime = audio.currentTime;
+            }
+        });
 
-        // サーバーへの送信処理
         async function syncGoldToDatabase(goldToSend) {
             const user = auth.currentUser;
-            if (!user) return; // 未ログインなら何もしない
+            if (!user) return; 
 
             isSyncingGold = true;
             try {
@@ -699,34 +902,23 @@ function updateCoverArt() {
                 const result = await addMusicGoldFunc({ seconds: goldToSend });
 
                 if (result.data.success) {
-                    // 成功したら、送った分だけバケツの水を捨てる
                     accumulatedGold -= goldToSend;
-                    
-                    // ゴールド表示をリアルタイム更新
                     const goldDisplay = document.getElementById("userGoldDisplay");
                     if (goldDisplay) goldDisplay.innerText = result.data.newGold.toLocaleString();
-                    
                     console.log(`🎵 ${result.data.added}G 獲得！(本日: ${result.data.totalToday}/3600G)`);
                 } else {
-                    // 上限到達などで弾かれた場合
                     console.log(`⚠️ ${result.data.message}`);
                     if (result.data.message.includes("上限")) {
-                        accumulatedGold = 0; // 上限ならこれ以上バケツに貯めても無駄なので捨てる
+                        accumulatedGold = 0; 
                     }
                 }
             } catch (e) {
-                // エラーの詳細を出力するように変更
                 console.error("ゴールドの同期に失敗:", e.message, e.code, e.details);
-                
-                // エラーの具体的な内容をトーストで表示（デバッグ用）
-                showToast("通信エラー: " + (e.message || "詳細不明"));
-                
                 accumulatedGold = 0; 
             } finally {
                 isSyncingGold = false;
             }
         }
-        // ==========================================
 
         progressBar.addEventListener('input', () => { audio.currentTime = progressBar.value; });
         durationEl.addEventListener('click', () => { showRemainingTime = !showRemainingTime; updateDurationDisplay(); });
@@ -745,7 +937,6 @@ function updateCoverArt() {
             } else { 
                 const validIndices = getValidIndices();
                 const currentPos = validIndices.indexOf(currentIndex);
-                // リストの最後でなければ次へ、最後なら止める
                 if (currentPos !== -1 && currentPos < validIndices.length - 1) {
                     nextTrack();
                 } else {
@@ -754,11 +945,9 @@ function updateCoverArt() {
             }
         });
 
-        // ▼ お気に入りフィルターのトグル ▼
         async function toggleFavoriteFilter() {
             const lang = document.getElementById('langSelect').value;
             
-            // お気に入りが0件の時はオンにできないようにする
             if (!isFavoriteFilter && likedTracks.size === 0) {
                 showToast(lang === 'en' ? "No favorite tracks" : "お気に入りの曲がありません");
                 return;
@@ -778,7 +967,6 @@ function updateCoverArt() {
             renderPlaylist();
             updateNextUpDisplay();
             
-            // もしフィルターをオンにしたとき、今の曲がお気に入りじゃなければ次の曲へ
             if (isFavoriteFilter && !likedTracks.has(currentIndex)) {
                 await nextTrack();
             }
@@ -797,7 +985,6 @@ function updateCoverArt() {
             }
             localStorage.setItem('shioyaMusic_likes', JSON.stringify([...likedTracks]));
             
-            // フィルターONの状態で最後のお気に入りを外したら、フィルターを自動解除
             if (isFavoriteFilter && likedTracks.size === 0) {
                 toggleFavoriteFilter();
             } else {
@@ -891,17 +1078,20 @@ function updateCoverArt() {
 
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        
         function closeNoticeModal() {
-    const checkbox = document.getElementById('stopNoticeToday');
-    if (checkbox && checkbox.checked) {
-        // 今日の日付（例: "2026/05/15"）を保存
-        const today = new Date().toLocaleDateString();
-        localStorage.setItem('shioyaMusic_lastNoticeDate', today);
-    }
-    closeModal('noticeModal');
-}
+            const checkbox = document.getElementById('stopNoticeToday');
+            if (checkbox && checkbox.checked) {
+                const today = new Date().toLocaleDateString();
+                localStorage.setItem('shioyaMusic_lastNoticeDate', today);
+            }
+            closeModal('noticeModal');
 
-        function openTrackInfo() {
+            checkAndShowImagePreload();
+        }
+
+        // ✅ 修正：ダウンロードされていない場合は通信せずに非表示にするように修正しました
+        async function openTrackInfo() {
             if(trackData.length === 0) return;
             const track = trackData[currentIndex];
             document.getElementById('modalTrackTitle').textContent = track.title;
@@ -909,8 +1099,21 @@ function updateCoverArt() {
             document.getElementById('modalTrackDesc').textContent = track.desc;
 
             const modalImg = document.getElementById('modalTrackCover');
-            if (track.cloudCover) { modalImg.src = track.cloudCover; modalImg.style.display = 'block'; } 
-            else { modalImg.style.display = 'none'; }
+            modalImg.style.display = 'none'; // 常に一旦非表示でリセットする
+
+            if (track.cloudCover && track.imageID && 'caches' in window) {
+                try {
+                    const cache = await caches.open('shioya-music-images');
+                    const response = await cache.match(getCacheKey(track.imageID));
+                    if (response) {
+                        const blob = await response.blob();
+                        modalImg.src = URL.createObjectURL(blob);
+                        modalImg.style.display = 'block';
+                    }
+                } catch(e) { 
+                    console.error(e); 
+                }
+            }
             openModal('infoModal');
         }
 
@@ -923,7 +1126,6 @@ function updateCoverArt() {
 
         function updatePlaylistTitle() {
             const lang = document.getElementById('langSelect').value;
-            // ▼ タイトルに件数を反映 ▼
             const count = isFavoriteFilter ? likedTracks.size : trackData.length;
             const suffixText = isFavoriteFilter ? " (Favorites)" : "";
             const jpText = isFavoriteFilter ? `プレイリスト (すきな ${count}曲)` : `プレイリスト (全${count}曲)`;
@@ -931,78 +1133,79 @@ function updateCoverArt() {
         }
 
         function changeLang(isInitial = false) {
-    const langSelect = document.getElementById('langSelect');
-    const lang = langSelect.value;
+            const langSelect = document.getElementById('langSelect');
+            const lang = langSelect.value;
 
-    // 言語設定をブラウザに保存（ページを跨いでも維持されるようにする）
-    localStorage.setItem('shioyaMusic_lang', lang);
+            localStorage.setItem('shioyaMusic_lang', lang);
 
-    updatePlaylistTitle();
+            updatePlaylistTitle();
 
-    if (lang === 'en') {
-        document.getElementById('ui-settings-bg-label').textContent = "Background Play";
-        document.getElementById('ui-modal-settings').textContent = "Settings";
-        document.getElementById('ui-settings-char-label').textContent = "Character";
-document.getElementById('ui-char-random').textContent = "Random";
-        document.getElementById('ui-char-komiya').textContent = "Komiya";
-        document.getElementById('ui-char-shioya').textContent = "Shioya";
-        document.getElementById('ui-char-machida').textContent = "Machida";
-        document.getElementById('ui-stop-notice-label').textContent = "Don't show again today";
-        document.getElementById('ui-modal-help').textContent = "Help & Usage";
-        document.getElementById('helpList').innerHTML = `
-            <li><strong>Play/Pause:</strong><img src="image/play.png" class="inline-icon"><img src="image/stop.png" class="inline-icon">Tap the big center button.</li>
-            <li><strong>Shuffle:</strong><img src="image/shuffle${getIconSuffix()}.png" class="inline-icon">Randomize track order.</li>
-            <li><strong>Loop:</strong><img src="image/loop${getIconSuffix()}.png" class="inline-icon">Toggle Off → All → One.</li>
-            <li><strong>Like:</strong><img src="image/hart${getIconSuffix()}.png" class="inline-icon"><img src="image/like.png" class="inline-icon">Save track to favorites.</li>
-            <li><strong>Download:</strong><img src="image/download${getIconSuffix()}.png" class="inline-icon">Save to device for offline play.</li>
-            <li><strong>Track Info:</strong><img src="image/info${getIconSuffix()}.png" class="inline-icon">View details & DL menu.</li>
-            <li><strong>Gold:</strong> Log in to earn 60G for every 60 seconds of listening. Collect G to enjoy customizing your experience! (Background playback excluded. Daily limit: 1 hour.)</li>
+            if (lang === 'en') {
+                document.getElementById('ui-settings-bg-label').textContent = "Background Play";
+                document.getElementById('ui-modal-settings').textContent = "Settings";
+                document.getElementById('ui-settings-char-label').textContent = "Character";
+                document.getElementById('ui-char-random').textContent = "Random";
+                document.getElementById('ui-char-komiya').textContent = "Komiya";
+                document.getElementById('ui-char-shioya').textContent = "Shioya";
+                document.getElementById('ui-char-machida').textContent = "Machida";
+                document.getElementById('ui-stop-notice-label').textContent = "Don't show again today";
+                document.getElementById('ui-modal-help').textContent = "Help & Usage";
+                document.getElementById('helpList').innerHTML = `
+                    <li><strong>Play/Pause:</strong><img src="image/play.png" class="inline-icon"><img src="image/stop.png" class="inline-icon">Tap the big center button.</li>
+                    <li><strong>Shuffle:</strong><img src="image/shuffle${getIconSuffix()}.png" class="inline-icon">Randomize track order.</li>
+                    <li><strong>Loop:</strong><img src="image/loop${getIconSuffix()}.png" class="inline-icon">Toggle Off → All → One.</li>
+                    <li><strong>Like:</strong><img src="image/hart${getIconSuffix()}.png" class="inline-icon"><img src="image/like.png" class="inline-icon">Save track to favorites.</li>
+                    <li><strong>Download:</strong><img src="image/download${getIconSuffix()}.png" class="inline-icon">Save to device for offline play.</li>
+                    <li><strong>Track Info:</strong><img src="image/info${getIconSuffix()}.png" class="inline-icon">View details & DL menu.</li>
+                    <li><strong>Gold:</strong> Log in to earn 60G for every 60 seconds of listening. Collect G to enjoy customizing your experience! (Background playback excluded. Daily limit: 1 hour.)</li>
+                `;
+                
+                document.getElementById('ui-notice-title').textContent = "Notice";
+                document.getElementById('ui-notice-desc').innerHTML = "In some environments, the in-app volume adjustment may not work. Please use your device's volume buttons.<br><br>Score and MIDI download features are currently under preparation and will be released sequentially.";
+                document.getElementById('ui-btn-score').textContent = "View Score";
+                document.getElementById('ui-btn-midi').textContent = "Download MIDI";
+
+                const preloadTitle = document.getElementById('ui-image-download-title');
+                if (preloadTitle) preloadTitle.textContent = "Download Additional Data";
+
+                if (!isInitial) showToast("Language changed to English.");
+
+            } else {
+                document.getElementById('ui-settings-bg-label').textContent = "バックグラウンド再生";
+                document.getElementById('ui-modal-settings').textContent = "設定";
+                document.getElementById('ui-settings-char-label').textContent = "キャラクター";
+                document.getElementById('ui-char-random').textContent = "ランダム";
+                document.getElementById('ui-char-komiya').textContent = "こみや";
+                document.getElementById('ui-char-shioya').textContent = "しおや";
+                document.getElementById('ui-char-machida').textContent = "町田";
+                document.getElementById('ui-stop-notice-label').textContent = "今日はもう表示しない";
+                document.getElementById('ui-modal-help').textContent = "ヘルプ・使い方";
+                document.getElementById('helpList').innerHTML = `
+                    <li><strong>再生/一時停止:</strong><img src="image/play.png" class="inline-icon"><img src="image/stop.png" class="inline-icon">中央のボタンをタップ。</li>
+                    <li><strong>シャッフル:</strong><img src="image/shuffle${getIconSuffix()}.png" class="inline-icon">ボタンで曲順をランダムに。</li>
+                    <li><strong>ループ:</strong><img src="image/loop${getIconSuffix()}.png" class="inline-icon">ボタンで「オフ → 全曲 → 1曲」切り替え。</li>
+                    <li><strong>お気に入り:</strong><img src="image/hart${getIconSuffix()}.png" class="inline-icon"><img src="image/like.png" class="inline-icon">ハートボタンで曲をお気に入り登録。</li>
+                    <li><strong>ダウンロード:</strong><img src="image/download${getIconSuffix()}.png" class="inline-icon">端末に保存しオフライン再生可能に。</li>
+                    <li><strong>楽曲情報:</strong><img src="image/info${getIconSuffix()}.png" class="inline-icon">インフォボタンから解説・DLメニューを表示。</li>
+                    <li><strong>ゴールド:</strong>ログインすると60秒視聴ごとに60G獲得できます。Gを集めて着せ替え機能をお楽しみください。（バックグラウンド再生は対象外です。一日の上限は１時間です。）</li>
+                `;
+
+                document.getElementById('ui-notice-title').textContent = "お知らせ";
+                document.getElementById('ui-notice-desc').innerHTML = "一部の環境ではアプリ内の音量調整機能が使えない場合があります。その際は端末の音量ボタンで調整してください。<br><br>楽譜・MIDIデータのダウンロード機能は現在準備中です。順次配信予定です。";
+                document.getElementById('ui-btn-score').textContent = "楽譜を見る";
+                document.getElementById('ui-btn-midi').textContent = "MIDI DL";
+
+                const preloadTitle = document.getElementById('ui-image-download-title');
+                if (preloadTitle) preloadTitle.textContent = "追加データのダウンロード";
+
+                if (!isInitial) showToast("日本語に切り替えました。");
+            }
             
-        `;
-        
-        document.getElementById('ui-notice-title').textContent = "Notice";
-        document.getElementById('ui-notice-desc').textContent = "Depending on your connection, tracks may take some time to load. Use the download feature for smooth playback.\n\nScore and MIDI download features are currently under preparation and will be released sequentially.";
-        document.getElementById('ui-btn-score').textContent = "View Score";
-        document.getElementById('ui-btn-midi').textContent = "Download MIDI";
-
-        // ▼ 修正点：初期化時以外（手動変更時）のみ通知を出す
-        if (!isInitial) showToast("Language changed to English.");
-
-    } else {
-        document.getElementById('ui-settings-bg-label').textContent = "バックグラウンド再生";
-        document.getElementById('ui-modal-settings').textContent = "設定";
-        document.getElementById('ui-settings-char-label').textContent = "キャラクター";
-document.getElementById('ui-char-random').textContent = "ランダム";
-        document.getElementById('ui-char-komiya').textContent = "こみや";
-        document.getElementById('ui-char-shioya').textContent = "しおや";
-        document.getElementById('ui-char-machida').textContent = "町田";
-        document.getElementById('ui-stop-notice-label').textContent = "今日はもう表示しない";
-        document.getElementById('ui-modal-help').textContent = "ヘルプ・使い方";
-        document.getElementById('helpList').innerHTML = `
-            <li><strong>再生/一時停止:</strong><img src="image/play.png" class="inline-icon"><img src="image/stop.png" class="inline-icon">中央のボタンをタップ。</li>
-            <li><strong>シャッフル:</strong><img src="image/shuffle${getIconSuffix()}.png" class="inline-icon">ボタンで曲順をランダムに。</li>
-            <li><strong>ループ:</strong><img src="image/loop${getIconSuffix()}.png" class="inline-icon">ボタンで「オフ → 全曲 → 1曲」切り替え。</li>
-            <li><strong>お気に入り:</strong><img src="image/hart${getIconSuffix()}.png" class="inline-icon"><img src="image/like.png" class="inline-icon">ハートボタンで曲をお気に入り登録。</li>
-            <li><strong>ダウンロード:</strong><img src="image/download${getIconSuffix()}.png" class="inline-icon">端末に保存しオフライン再生可能に。</li>
-            <li><strong>楽曲情報:</strong><img src="image/info${getIconSuffix()}.png" class="inline-icon">インフォボタンから解説・DLメニューを表示。</li>
-            <li><strong>ゴールド:</strong>ログインすると60秒視聴ごとに60G獲得できます。Gを集めて着せ替え機能をお楽しみください。（バックグラウンド再生は対象外です。一日の上限は１時間です。）</li>
-            
-        `;
-
-        document.getElementById('ui-notice-title').textContent = "お知らせ";
-        document.getElementById('ui-notice-desc').textContent = "お使いの環境によっては通信状況により楽曲の読み込みにお時間がかかる場合があります。ダウンロード機能を活用すると快適に再生できます。\n\n楽譜・MIDIデータのダウンロード機能は現在準備中です。順次配信予定です。";
-        document.getElementById('ui-btn-score').textContent = "楽譜を見る";
-        document.getElementById('ui-btn-midi').textContent = "MIDI DL";
-
-        // ▼ 修正点：初期化時以外（手動変更時）のみ通知を出す
-        if (!isInitial) showToast("日本語に切り替えました。");
-    }
-    
-    if(trackData.length > 0) {
-        currentArtist.textContent = formatArtistText(trackData[currentIndex].artist);
-        renderPlaylist();
-    }
-}
+            if(trackData.length > 0) {
+                currentArtist.textContent = formatArtistText(trackData[currentIndex].artist);
+                renderPlaylist();
+            }
+        }
 
         auth.onAuthStateChanged(async (user) => {
             if (user) {
@@ -1022,15 +1225,14 @@ document.getElementById('ui-char-random').textContent = "ランダム";
                 }
             }
         });
-        // 保存された言語があれば、セレクトボックスの値をそれに合わせて切り替える
-const savedLang = localStorage.getItem('shioyaMusic_lang');
-if (savedLang) {
-    document.getElementById('langSelect').value = savedLang;
-    changeLang(true); // trueを渡してトーストを出さずに言語適用
-}
-init();
 
+        const savedLang = localStorage.getItem('shioyaMusic_lang');
+        if (savedLang) {
+            document.getElementById('langSelect').value = savedLang;
+            changeLang(true);
+        }
 
+        init();
     </script>
 </body>
 </html>

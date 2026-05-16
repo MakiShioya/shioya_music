@@ -90,16 +90,59 @@
 
         #account-setting-icon { transition: transform 0.3s ease; }
         #account-setting-icon:hover { transform: rotate(45deg); }
+
+        /* ==========================================
+           ✅ 追加：ロード画面用スタイル
+           ========================================== */
+        .loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        .loading-screen.hidden {
+            opacity: 0; visibility: hidden; pointer-events: none;
+        }
+        .loading-content {
+            text-align: center; color: var(--text-main); padding: 20px; width: 90%; max-width: 400px;
+        }
+        .loading-spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-orange);
+            border-radius: 50%;
+            animation: loading-spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+        .loading-title {
+            font-size: 1.6rem; font-weight: bold; color: var(--title-color);
+            margin-bottom: 30px; letter-spacing: 3px; text-transform: uppercase;
+        }
+        .loading-tips {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px; border-radius: 8px; font-size: 0.95rem; line-height: 1.6;
+            text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        @keyframes loading-spin { 100% { transform: rotate(360deg); } }
     </style>
     <script>
         const savedTheme = localStorage.getItem('shioyaMusic_theme') || 'theme-default';
         document.documentElement.className = savedTheme;
-        // 保存された言語を取得
         const currentLang = localStorage.getItem('shioyaMusic_lang') || 'ja';
     </script>
 </head>
 <body>
     <script>document.body.className = savedTheme;</script>
+
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-title" id="loadingTitle">tips</div>
+            <div class="loading-tips" id="loadingTips">音楽を読み込んでいます...</div>
+        </div>
+    </div>
 
     <header>
         <a href="index.html" class="back-btn" id="ui-back-btn">◀ 戻る</a>
@@ -110,7 +153,6 @@
     <div class="container">
         <div class="mypage-panel">
             
-            <!-- 👤 アカウントセクション -->
             <h2 class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
                 <span id="ui-sec-account">アカウント</span>
                 <button onclick="openModal('accountSettingsModal')" style="background:none; border:none; cursor:pointer; display:flex; padding: 5px;">
@@ -136,7 +178,6 @@
                 <button class="dl-btn" id="ui-btn-auth-main" style="font-size: 1.2rem; padding: 15px 30px;" onclick="showAuthModal()">ログイン / 新規登録</button>
             </div>
 
-            <!-- 🛒 ショップセクション -->
             <h2 class="section-title" id="ui-sec-shop">ショップ</h2>
             
             <div class="tab-nav">
@@ -174,7 +215,6 @@
         </div>
     </div>
 
-    <!-- モーダル群 -->
     <div class="modal-overlay" id="authModal" onclick="closeAuthModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeAuthModal()">×</button>
@@ -269,7 +309,6 @@
         }
         applyLanguage();
 
-        // 1. アイテム定義（英語名 labelEn を追加）
         const NORMAL_ICONS = [
             { id: 'icon-default', label: 'デフォルト', labelEn: 'Default', xcode: 'default', price: 0, img: 'image/default_icon.png' },
             { id: 'icon-komiya', label: 'こみや', labelEn: 'Komiya', xcode: 'KomiyaIcon', price: 30000, img: 'image/komiya_icon.png' },
@@ -339,8 +378,11 @@
             } else {
                 renderShop();
             }
+            updateSettingIcon();
+            
+            // データ取得と描画が終わったらロード画面をフェードアウト
+            hideLoadingScreen(); 
         });
-        updateSettingIcon();
 
         async function loadMusicShopData(user) {
             const doc = await db.collection("users").doc(user.uid).get();
@@ -392,7 +434,6 @@
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             
-            // 言語別テキストの用意
             const txtEquipped = currentLang === 'en' ? 'Equipped' : '装備中';
             const txtOwned = currentLang === 'en' ? 'Owned' : '所持済み';
             const txtLogin = currentLang === 'en' ? 'Login Req.' : '要ログイン';
@@ -654,6 +695,52 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
+
+        // --- ロード画面用 Tipsリスト ---
+        const appTips = {
+            ja: [
+                "音楽を再生したまま画面を開いておくと、1日最大3600Gまでポイントが貯まります。",
+                "「購入の復元」はマイページのアカウント設定から行えます。",
+                "楽曲画面でダウンロードしておけば、オフラインでも通信量を気にせず聴けます。",
+                "気分に合わせてテーマカラーを着せ替えてみましょう！",
+                "お気に入りの曲は、ハートマークを押してリストにまとめられます。"
+            ],
+            en: [
+                "Keep the app open while playing music to earn up to 3600G daily.",
+                "You can restore purchases from the Account Settings on My Page.",
+                "Downloaded tracks can be played offline without using mobile data.",
+                "Change the theme color to match your current mood!",
+                "Tap the heart icon to save your favorite tracks to a special list."
+            ]
+        };
+
+        function initLoadingScreen() {
+            const lang = localStorage.getItem('shioyaMusic_lang') || 'ja';
+
+            const titleEl = document.getElementById('loadingTitle');
+            if (titleEl) {
+                titleEl.textContent = lang === 'en' ? 'Tips' : 'Tips';
+            }
+
+            const tipsList = appTips[lang] || appTips['ja'];
+            const randomTip = tipsList[Math.floor(Math.random() * tipsList.length)];
+            
+            const tipsEl = document.getElementById('loadingTips');
+            if (tipsEl) {
+                tipsEl.textContent = randomTip;
+            }
+        }
+
+        function hideLoadingScreen() {
+            const screen = document.getElementById('loadingScreen');
+            if (screen) {
+                setTimeout(() => {
+                    screen.classList.add('hidden');
+                }, 200);
+            }
+        }
+
+        initLoadingScreen();
     </script>
 </body>
 </html>

@@ -1,1 +1,13 @@
+# 秘密情報の入った設定ファイル
 js/config.js
+
+# 依存ライブラリ（ログ、キャッシュなど含む）
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Xcodeの個人設定・状態キャッシュ（複数人開発や再ビルド時のエラーを防ぐため除外）
+**/xcuserdata/
+**/UserInterfaceState.xcuserstate
+**/.DS_Store
