@@ -542,106 +542,112 @@
         }
 
         async function buyPremiumItem(itemId, packageId, label) {
-            const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
-            
-            if (!isNative) {
-                showToast(currentLang === 'en' ? "Purchases are only available in the iOS app." : "決済はiOSアプリ版からのみご利用いただけます。");
-                return;
-            }
+    const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+    
+    if (!isNative) {
+        showToast(currentLang === 'en' ? "Purchases are only available in the iOS app." : "決済はiOSアプリ版からのみご利用いただけます。");
+        return;
+    }
 
+    const Purchases = window.Capacitor.Plugins.Purchases;
+
+    try {
+        showToast(currentLang === 'en' ? "Fetching product info..." : "商品情報を取得中...");
+        
+        const offerings = await Purchases.getOfferings();
+        if (!offerings.current || offerings.current.availablePackages.length === 0) {
+            showToast(currentLang === 'en' ? "Product not found." : "商品が見つかりません。");
+            return;
+        }
+
+        const packageToBuy = offerings.current.availablePackages.find(p => p.identifier === packageId);
+        if (!packageToBuy) {
+            showToast(currentLang === 'en' ? "Specified product not found." : "指定された商品が見つかりません。");
+            return;
+        }
+
+        // ✅ 変更点: ログインチェックを削除し、先に決済を実行
+        const { customerInfo } = await Purchases.purchasePackage({ aPackage: packageToBuy });
+        const entitlementId = itemId.replace('theme-premium-', 'entitlement_'); 
+
+        if (typeof customerInfo.entitlements.active[entitlementId] !== "undefined") {
             const user = auth.currentUser;
-            if (!user) {
-                showToast(currentLang === 'en' ? "Login required to purchase." : "購入するにはログインが必要です。");
-                return;
-            }
-
-            const Purchases = window.Capacitor.Plugins.Purchases;
-
-            try {
-                showToast(currentLang === 'en' ? "Fetching product info..." : "商品情報を取得中...");
-                
-                const offerings = await Purchases.getOfferings();
-                if (!offerings.current || offerings.current.availablePackages.length === 0) {
-                    showToast(currentLang === 'en' ? "Product not found." : "商品が見つかりません。");
-                    return;
-                }
-
-                const packageToBuy = offerings.current.availablePackages.find(p => p.identifier === packageId);
-                if (!packageToBuy) {
-                    showToast(currentLang === 'en' ? "Specified product not found." : "指定された商品が見つかりません。");
-                    return;
-                }
-
-                const { customerInfo } = await Purchases.purchasePackage({ aPackage: packageToBuy });
-                const entitlementId = itemId.replace('theme-premium-', 'entitlement_'); 
-
-                if (typeof customerInfo.entitlements.active[entitlementId] !== "undefined") {
-                    showToast(currentLang === 'en' ? `Purchased "${label}"! Thank you!` : `「${label}」を購入しました！ありがとうございます！`);
-                    
-                    musicData.ownedThemes.push(itemId);
-                    await db.collection("users").doc(user.uid).update({
-                        ownedMusicThemes: firebase.firestore.FieldValue.arrayUnion(itemId)
-                    });
-                    
-                    equipMusicItem(itemId, 'theme', null);
-                }
-            } catch (e) {
-                if (!e.userCancelled) {
-                    showToast((currentLang === 'en' ? "Error occurred: " : "エラーが発生しました: ") + e.message);
-                } else {
-                    showToast(currentLang === 'en' ? "Purchase cancelled." : "購入をキャンセルしました。");
-                }
+            
+            // ✅ ログインしていればFirestoreに保存、していなければ成功メッセージのみ
+            if (user) {
+                musicData.ownedThemes.push(itemId);
+                await db.collection("users").doc(user.uid).update({
+                    ownedMusicThemes: firebase.firestore.FieldValue.arrayUnion(itemId)
+                });
+                equipMusicItem(itemId, 'theme', null);
+                showToast(currentLang === 'en' ? `Purchased "${label}"!` : `「${label}」を購入しました！`);
+            } else {
+                // ログインしていない場合：アイテムは即時反映されるが、同期できないことを伝える
+                showToast(currentLang === 'en' 
+                    ? "Purchased! Log in later to sync this item across devices." 
+                    : "購入完了！後でログインすればデータを他の端末と同期できます。");
             }
         }
+    } catch (e) {
+        if (!e.userCancelled) {
+            showToast((currentLang === 'en' ? "Error occurred: " : "エラーが発生しました: ") + e.message);
+        } else {
+            showToast(currentLang === 'en' ? "Purchase cancelled." : "購入をキャンセルしました。");
+        }
+    }
+}
 
         async function restorePurchases() {
-            const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
-            if (!isNative) {
-                showToast(currentLang === 'en' ? "Restore is only available in the iOS app." : "復元機能はiOSアプリ版でのみ利用可能です。");
-                return;
-            }
+    const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+    if (!isNative) {
+        showToast(currentLang === 'en' ? "Restore is only available in the iOS app." : "復元機能はiOSアプリ版でのみ利用可能です。");
+        return;
+    }
 
-            const user = auth.currentUser;
-            if (!user) {
-                showToast(currentLang === 'en' ? "Login required to restore." : "復元するにはログインが必要です。");
-                return;
-            }
+    const Purchases = window.Capacitor.Plugins.Purchases;
 
-            const Purchases = window.Capacitor.Plugins.Purchases;
+    try {
+        showToast(currentLang === 'en' ? "Checking purchase history..." : "購入履歴を照合中...");
+        
+        const { customerInfo } = await Purchases.restorePurchases();
+        const themeIds = ['theme-premium-komiya', 'theme-premium-shioya', 'theme-premium-happa', 'theme-premium-machida'];
+        let restoredCount = 0;
 
-            try {
-                showToast(currentLang === 'en' ? "Checking purchase history..." : "購入履歴を照合中...");
+        for (const itemId of themeIds) {
+            const entitlementId = itemId.replace('theme-premium-', 'entitlement_');
+            
+            // まだ所持していないアイテムであり、かつストア側に購入権限がアクティブなら
+            if (!musicData.ownedThemes.includes(itemId) && 
+                typeof customerInfo.entitlements.active[entitlementId] !== "undefined") {
                 
-                const { customerInfo } = await Purchases.restorePurchases();
-                const themeIds = ['theme-premium-komiya', 'theme-premium-shioya', 'theme-premium-happa', 'theme-premium-machida'];
-                let restoredCount = 0;
-
-                for (const itemId of themeIds) {
-                    const entitlementId = itemId.replace('theme-premium-', 'entitlement_');
-                    
-                    if (!musicData.ownedThemes.includes(itemId) && 
-                        typeof customerInfo.entitlements.active[entitlementId] !== "undefined") {
-                        
-                        musicData.ownedThemes.push(itemId);
-                        restoredCount++;
-                    }
-                }
-
-                if (restoredCount > 0) {
-                    await db.collection("users").doc(user.uid).update({
-                        ownedMusicThemes: musicData.ownedThemes
-                    });
-                    showToast(currentLang === 'en' ? `Restored ${restoredCount} items!` : `${restoredCount} 件の購入情報を復元しました！`);
-                    renderShop(); 
-                } else {
-                    showToast(currentLang === 'en' ? "No restore data found." : "復元できる購入情報が見つかりませんでした。");
-                }
-                
-                closeModal('accountSettingsModal');
-            } catch (e) {
-                showToast(currentLang === 'en' ? "Error during restore." : "復元中にエラーが発生しました。");
+                musicData.ownedThemes.push(itemId);
+                restoredCount++;
             }
         }
+
+        if (restoredCount > 0) {
+            const user = auth.currentUser;
+            // ログイン中ならFirestoreに同期
+            if (user) {
+                await db.collection("users").doc(user.uid).update({
+                    ownedMusicThemes: musicData.ownedThemes
+                });
+            }
+            
+            showToast(currentLang === 'en' 
+                ? `Restored ${restoredCount} items!` 
+                : `${restoredCount} 件の購入情報を復元しました！`);
+            
+            renderShop(); // 画面を更新してボタン状態を反映
+        } else {
+            showToast(currentLang === 'en' ? "No restore data found." : "復元できる購入情報が見つかりませんでした。");
+        }
+        
+        closeModal('accountSettingsModal');
+    } catch (e) {
+        showToast(currentLang === 'en' ? "Error during restore." : "復元中にエラーが発生しました。");
+    }
+}
 
         async function equipMusicItem(itemId, type, xcode) {
             const user = auth.currentUser;

@@ -61,7 +61,7 @@ body.theme-premium-shioya {
 body.theme-premium-happa {
     --bg-grad-start: #000033; --bg-grad-end: #800000; --bg-color: #000033;
     --panel-bg: rgba(184, 134, 11, 0.6); --modal-bg-start: #00004d; --modal-bg-end: #4d0000;
-    --bg-image: url('../image/happa.png');
+    --bg-image: url('../image/a_touka.png');
 }
 body.theme-premium-machida {
     --bg-grad-start: #e0e0e0; --bg-grad-end: #8bc34a; --bg-color: #e0e0e0;
