@@ -138,7 +138,6 @@ function registerUser() {
         user.updateProfile({ displayName: tempName }).then(() => {
             return db.collection("users").doc(user.uid).set({
                 name: tempName, 
-                email: email, 
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 gold: 100, // 共通ポイント
                 // ▼ ミュージック用の初期設定を追加
@@ -246,7 +245,6 @@ async function setupSocialUser(user) {
         const tempName = user.displayName || "新規ユーザー";
         await userRef.set({
             name: tempName,
-            email: user.email,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             gold: 100,
             // ▼ ミュージック用の初期設定を追加
